@@ -1,7 +1,7 @@
 {
   "build": {
     "clock_source": "hsi+pll",
-    "extra_flags": "-DCH57 -DCH57X -DCH573",
+    "extra_flags": "-DCH57 -DCH57xF -DCH5xx -DCH57X -DCH57x -DCH573",
     "f_cpu": "20000000L",
     "hwids": [
       [
@@ -20,10 +20,11 @@
       "wch-link"
     ],
     "openocd_config": "wch-riscv.cfg",
-    "svd_path": "CH573.svd"
+    "svd_path": "CH57Xxx.svd"
   },
   "frameworks": [
-    "noneos-sdk"
+    "noneos-sdk",
+    "ch32v003fun"
   ],
   "name": "Generic CH573F",
   "upload": {

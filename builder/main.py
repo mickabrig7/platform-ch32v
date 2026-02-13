@@ -28,6 +28,7 @@ from SCons.Script import (
 env = DefaultEnvironment()
 platform = env.PioPlatform()
 board_config = env.BoardConfig()
+chip_name = str(board_config.get("build.mcu", "")).lower()
 
 # Depending on whether we're using GCC8 or GCC12, the compiler executable's names need to be adapted.
 # Attempt proper detection by looking at the package version.
@@ -44,8 +45,8 @@ env.Replace(
     RANLIB="%s-ranlib" % compiler_triple,
     SIZETOOL="%s-size" % compiler_triple,
     ARFLAGS=["rc"],
-    SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.init|\.vector)\s+(\d+).*",
-    SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit|\.stack)\s+(\d+).*",
+    SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.init|\.loadcodelalign|\.highcode|\.loadcode|\.vector)\s+(\d+).*",
+    SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit|\.loadcode|\.highcode|\.stack)\s+(\d+).*",
     SIZECHECKCMD="$SIZETOOL -A -d $SOURCES",
     SIZEPRINTCMD="$SIZETOOL --format=berkeley $SOURCES",
     PROGSUFFIX=".elf",
@@ -178,7 +179,8 @@ elif upload_protocol == "isp":
     )
     upload_actions = [env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE")]
 elif upload_protocol == "minichlink":
-    flash_start = board_config.get("upload.offset_address", "0x08000000")
+    # target address can be a hex value of a symbolic name like "flash", "bootloader", "eeprom", "ram", "options"
+    flash_start = board_config.get("upload.offset_address", "flash")
     env.Replace(
         UPLOADER="minichlink",
         UPLOADERFLAGS="", # write binary
@@ -206,14 +208,17 @@ env.AddPlatformTarget("upload", upload_target, upload_actions, "Upload")
 #
 # Target: Disable / Enable / Check Code Read Protection, Erase
 #
-def generate_minichlink_action(args: List[str], action_name:str):
-    wchisp_path = os.path.join(
+def generate_minichlink_action(args: List[str], action_name:str, upload_protocol_is_minichlink: bool):
+    minichlink_path = os.path.join(
         platform.get_package_dir("tool-minichlink") or "",
         "minichlink"
     )
-    cmd = ["\"%s\"" % wchisp_path]
-    cmd.append("$UPLOADERFLAGS")
+    cmd = ["\"%s\"" % minichlink_path]
+    # we don't want uploader flags pertaining to other uploaders like wch-linke.
+    if upload_protocol_is_minichlink:
+        cmd.append("$UPLOADERFLAGS")
     cmd.extend(args)
+    # print("Returning action: " + str(cmd))
     return env.VerboseAction(" ".join(cmd), action_name)
 
 def generate_wlink_action(args: List[str], action_name:str):
@@ -337,24 +342,25 @@ elif upload_protocol == "isp":
         "Reset (ISP)"
     )
 # make minichlink SDI printf monitor show up even when it's not the selected upload protocol
+is_minichlink = upload_protocol == "minichlink"
 if upload_protocol == "minichlink" or "ch32v003fun" in frameworks or len(frameworks) == 0:
     env.AddPlatformTarget(
         "sdi_printf_monitor", None, generate_minichlink_action([
             "-T"
-        ], "Starting SDI Printf Monitor"),
-        "Monitor SDI Printf (ch32v003fun)"
+        ], "Starting SDI Printf Monitor", is_minichlink),
+        "Monitor SDI Printf (ch32fun)"
     )
 if upload_protocol == "minichlink":
     env.AddPlatformTarget(
         "enable_flash_protection", None, generate_minichlink_action([
             "-P"
-        ], "Enabling Flash Protection"),
+        ], "Enabling Flash Protection", is_minichlink),
         "Enable Flash Protection"
     )
     env.AddPlatformTarget(
         "disable_flash_protection", None, generate_minichlink_action([
             "-p"
-        ], "Disabling Flash Protection"),
+        ], "Disabling Flash Protection", is_minichlink),
         "Disable Flash Protection"
     )
 

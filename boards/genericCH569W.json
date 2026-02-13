@@ -1,7 +1,7 @@
 {
   "build": {
     "clock_source": "hsi+pll",
-    "extra_flags": "-DCH56 -DCH56X -DCH569",
+    "extra_flags": "-DCH56 -DCH56xW -DCH5xx -DCH56X -DCH56x -DCH569",
     "f_cpu": "120000000L",
     "hwids": [
       [
@@ -20,10 +20,11 @@
       "wch-link"
     ],
     "openocd_config": "wch-riscv.cfg",
-    "svd_path": "CH569.svd"
+    "svd_path": "CH56Xxx.svd"
   },
   "frameworks": [
-    "noneos-sdk"
+    "noneos-sdk",
+    "ch32v003fun"
   ],
   "name": "Generic CH569W",
   "upload": {

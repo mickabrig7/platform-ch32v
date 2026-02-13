@@ -53,6 +53,8 @@ extern "C" {
 #include <ch32x035.h>
 #elif defined(CH32L10X)
 #include <ch32l103.h>
+#elif defined(CH58x)
+#include <CH58x_common.h>
 #endif
 extern uint32_t SystemCoreClock;
 /*=============================================================================

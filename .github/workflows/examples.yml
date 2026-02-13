@@ -7,6 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        #os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
         os: [ubuntu-latest, windows-latest, macos-latest]
         example:
           - "examples/adc-cpu-temp-none-os"
@@ -15,18 +16,22 @@ jobs:
           - "examples/blinky-arduino-ch32v003"
           - "examples/blinky-arduino-ch32v307"
           - "examples/blinky-arduino-tinyusb"
-          - "examples/blinky-ch32v003fun"
+          - "examples/blinky-ch32fun"
+          - "examples/blinky-ch32fun-ch5xx"
           - "examples/blinky-none-os"
           - "examples/blinky-none-os-ch5xx"
           - "examples/blinky-none-os-ch6xx"
+          - "examples/blinky-none-os-h41x-dual"
           - "examples/ch32fun-blink"
           - "examples/ch32fun-oled"
           - "examples/ch32fun-rv003usb-composite-hid"
           - "examples/uart-printf-none-os"
           - "examples/webserver-ch32v307-none-os"
+          - "examples/webserver-ch32h417-none-os"
           - "examples/blinky-freertos"
           - "examples/blinky-freertos-ch58x-ch59x"
           - "examples/hello-world-harmony-liteos"
+          - "examples/hello-world-harmony-liteos-ch5xx"
           - "examples/hello-world-rt-thread"
           - "examples/hello-world-rt-thread-ch5xx"
           - "examples/hello-world-tencent-os"
@@ -38,6 +43,7 @@ jobs:
           - "examples/usb-cdc-wch32v307-none-os"
           - "examples/ble-hid-ch32v208"
           - "examples/ble-usb-cdc-ch58x"
+          - "examples/ble-hid-ch572"
           - "examples/ble-hid-ch59x"
           - "examples/usb-pd-none-os"
           - "examples/usb-pd-none-os-ch641"
